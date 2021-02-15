@@ -1,0 +1,26 @@
+{
+  "name": "anji-store-api",
+  "main": "app.js",
+  "licenses": [],
+  "scripts": {
+    "start": "node app.js",
+    "server": "nodemon app.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false  npm install --prefix client && npm run build --prefix client",
+    "build:azure": "NPM_CONFIG_PRODUCTION=false  npm install --prefix client && npm run build --prefix client"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cloudinary": "^1.24.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "googleapis": "^67.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.15",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.4.18"
+  }
+}
