@@ -6,25 +6,7 @@ function getUserDetail(req, res) {
   res.json({ user: req.user }).status(201);
 }
 
-function getAllUser(req, res, next) {
-  if (req.user.role === 1) {
-    usermodel
-      .find(
-        {},
-        {
-          password: 0,
-        }
-      )
-      .exec(function (err, done) {
-        if (err) {
-          return next(err);
-        }
-        res.status(200).json(done);
-      });
-  } else {
-    return next("Access denied");
-  }
-}
+
 
 function searchUser(req, res, next) {
   if (req.loggedUser.role === 1) {
@@ -74,11 +56,8 @@ function updateUser(req, res, next) {
     });
 }
 
-
-
 module.exports = {
   getUserDetail,
-  getAllUser,
   getUser,
   updateUser,
 };

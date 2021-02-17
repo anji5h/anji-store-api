@@ -37,10 +37,13 @@ const userSchema = new mongoose.Schema(
     },
     token: String,
     tokenExpiry: Date,
-    status: {
-      type: Number,
-      enum: [0, 1, 2], // 0:not verified, 1:active, 2: disabled/suspended
-      default: 0,
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   {

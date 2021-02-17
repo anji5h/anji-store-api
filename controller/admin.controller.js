@@ -10,12 +10,32 @@ async function createAdmin(req, res, next) {
       email: process.env.EMAIL,
       password: process.env.ADMIN_PASSWORD,
       role: process.env.ADMIN_ROLE,
+      verified: true,
     });
     res.json({ message: "admin user created" }).status(201);
   } catch (err) {
     return next({ message: mapMongoError(err), status: 400 });
   }
 }
+async function getAllUser(req, res, next) {
+  try {
+    let user = await usermodel.find(
+      {},
+      {
+        name: 1,
+        email: 1,
+        username: 1,
+        role: 1,
+        disabled: 1,
+        verified: 1,
+      }
+    );
+    res.status(200).json({ user });
+  } catch (err) {
+    next({ message: "failed to retrieve data.", status: 400 });
+  }
+}
+
 function disableUser(req, res, next) {
   usermodel
     .findById({ _id: req.params.id })
@@ -37,4 +57,5 @@ function disableUser(req, res, next) {
 module.exports = {
   createAdmin,
   disableUser,
+  getAllUser,
 };

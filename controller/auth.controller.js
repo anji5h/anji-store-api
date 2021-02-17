@@ -19,8 +19,11 @@ async function login(req, res, next) {
     if (!user) {
       throw { message: "incorrect username/email", status: 401 };
     }
-    let isMatch = await user.checkPassword(req.body.password, user.password);
-    if (!isMatch) throw { message: "incorrect password", status: 401 };
+    if (user.disabled) {
+      throw { message: "your account is suspended. please contact support." };
+    }
+    let isMatchPassword = await user.checkPassword(req.body.password, user.password);
+    if (!isMatchPassword) throw { message: "incorrect password", status: 401 };
     const authToken = await token.createToken({ id: user._id });
     res
       .cookie("auth_token", authToken, { maxAge: 8.64e7, httpOnly: true })
@@ -40,7 +43,9 @@ async function signup(req, res, next) {
     return next({ message: mapMongoError(err), status: 400 });
   }
 }
-
+function logout(req, res) {
+  res.clearCookie("auth_token").json({ message: "logged out" }).status(201);
+}
 async function resetPassword(req, res, next) {
   usermodel.findOne({ email: req.body.email }).exec(function (err, user) {
     if (err) {
@@ -111,4 +116,5 @@ async function resetPassword(req, res, next) {
 module.exports = {
   login,
   signup,
+  logout,
 };
