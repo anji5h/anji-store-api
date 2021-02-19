@@ -1,22 +1,21 @@
-const Productctrl = require("./../controller/product.controller");
 const router = require("express").Router();
-const upload = require("../middleware/multer");
-const authentication = require("./../../../middleware/token-auth");
-const cloudinary = require("../middleware/cloudinary");
+const authentication = require("./../middleware/jwt");
+const upload = require("./../middleware/multer");
 const productController = require("./../controller/product.controller");
 const reviewController = require("../controller/review.controller");
+const uploadImage = require("../middleware/uploadImage");
 
 router
   .route("/")
-  .get(Productctrl.fetchall)
-  .post(authentication, upload.single("image"), cloudinary, Productctrl.add);
+  .get(productController.fetchall)
+  .post(authentication, upload.single("image"), uploadImage, productController.addProduct);
 router.get("/user", authentication, productController.fetchUserproduct);
 router.route("/search").get(productController.search).post(productController.searchproduct);
 router
   .route("/:id")
-  .get(Productctrl.fetchById)
-  .put(authentication, upload.single("image"), cloudinary, Productctrl.update)
-  .delete(authentication, Productctrl.remove);
+  .get(productController.fetchById)
+  .put(authentication, upload.single("image"), uploadImage, productController.update)
+  .delete(authentication, productController.remove);
 
 router
   .route("/reviews/:id")

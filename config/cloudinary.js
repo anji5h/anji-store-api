@@ -6,14 +6,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const upload = async function (path, filename) {
+const upload = function (path, ref) {
   return cloudinary.uploader.upload(path, {
-    public_id: filename,
+    public_id: ref,
     overwrite: true,
   });
 };
-const destroy = async function (filename) {
-  return cloudinary.uploader.destroy(filename, { invalidate: true });
+const destroy = function (ref) {
+  return cloudinary.uploader.destroy(ref, { invalidate: true });
 };
 module.exports = {
   upload,
