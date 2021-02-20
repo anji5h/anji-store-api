@@ -13,15 +13,44 @@ async function addProduct(req, res, next) {
   }
 }
 
-function fetchall(req, res, next) {}
-
-function fetchUserproduct(req, res, next) {}
+async function getAllProduct(req, res, next) {
+  try {
+    let pageSize = 10;
+    let page = Number(req.query.pagenumber) || 1;
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: "i",
+          },
+        }
+      : {};
+    let req1 = productModel
+      .find(keyword)
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .lean();
+    let req2 = productModel.countDocuments(keyword);
+    let [products, count] = await Promise.all([req1, req2]);
+    res.json({ products, page, pages: Math.ceil(count / pageSize) }).status(201);
+  } catch (err) {
+    console.log(err);
+    next({ message: "product fetch failed", status: 400 });
+  }
+}
 
 function search(req, res, next) {}
 
 function searchproduct(req, res, next) {}
 
-function fetchById(req, res, next) {}
+async function getProductById(req, res, next) {
+  try {
+    let product = await productModel.findById(req.params.id).lean();
+    res.json({ product }).status(201);
+  } catch (err) {
+    next({ message: "product fetch failed", status: 400 });
+  }
+}
 
 function update(req, res, next) {}
 
@@ -31,9 +60,8 @@ module.exports = {
   addProduct,
   update,
   remove,
-  fetchById,
-  fetchall,
-  fetchUserproduct,
+  getProductById,
+  getAllProduct,
   search,
   searchproduct,
 };

@@ -7,13 +7,12 @@ const uploadImage = require("../middleware/uploadImage");
 
 router
   .route("/")
-  .get(productController.fetchall)
+  .get(productController.getAllProduct)
   .post(authentication, upload.single("image"), uploadImage, productController.addProduct);
-router.get("/user", authentication, productController.fetchUserproduct);
 router.route("/search").get(productController.search).post(productController.searchproduct);
 router
   .route("/:id")
-  .get(productController.fetchById)
+  .get(productController.getProductById)
   .put(authentication, upload.single("image"), uploadImage, productController.update)
   .delete(authentication, productController.remove);
 
