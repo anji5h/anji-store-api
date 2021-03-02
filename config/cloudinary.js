@@ -10,6 +10,7 @@ const upload = function (path, ref) {
   return cloudinary.uploader.upload(path, {
     public_id: ref,
     overwrite: true,
+    
   });
 };
 const destroy = function (ref) {

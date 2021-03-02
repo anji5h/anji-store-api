@@ -25,10 +25,7 @@ async function login(req, res, next) {
     let isMatchPassword = await user.checkPassword(req.body.password, user.password);
     if (!isMatchPassword) throw { message: "incorrect password", status: 401 };
     const authToken = await token.createToken({ id: user._id });
-    res
-      .cookie("auth_token", authToken, { maxAge: 8.64e7, httpOnly: true })
-      .json({ user })
-      .status(201);
+    res.cookie("auth_token", authToken, { httpOnly: true }).json({ user }).status(201);
   } catch (err) {
     return next({ message: err.message, status: err.status });
   }

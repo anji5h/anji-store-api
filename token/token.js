@@ -6,8 +6,8 @@ const verifyToken = async function (token) {
   return promisify(jwt.verify)(token, process.env.JWT_SECRET);
 };
 
-const createToken = async function (payload) {
-  return promisify(jwt.sign)(payload, process.env.JWT_SECRET);
+const createToken = async function (payload, expire = "1d") {
+  return promisify(jwt.sign)(payload, process.env.JWT_SECRET, { expiresIn: expire });
 };
 
 module.exports = {

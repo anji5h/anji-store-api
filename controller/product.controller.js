@@ -52,16 +52,42 @@ async function getProductById(req, res, next) {
   }
 }
 
-function update(req, res, next) {}
+async function updateProduct(req, res, next) {
+  try {
+    let data = req.body;
+    data.user = req.user._id;
+    await productModel.updateOne({ _id: req.params.id }, mapProduct(data));
+    res.json({ message: "product updated" }).status(201);
+  } catch (err) {
+    next({ message: "product update failed", status: 400 });
+  }
+}
 
-function remove(req, res, next) {}
+async function getTopProducts(req, res, next) {
+  try {
+    let products = await productModel.find({}).sort({ rating: -1 }).limit(3);
+    res.json({ products }).status(201);
+  } catch (err) {
+    next({ message: "product fetch failed", status: 400 });
+  }
+}
+
+async function removeProduct(req, res, next) {
+  try {
+    await productModel.deleteOne({ _id: req.params.id });
+    res.json({ message: "product deleted" }).status(201);
+  } catch (err) {
+    next({ message: "product deletion failed", status: 400 });
+  }
+}
 
 module.exports = {
   addProduct,
-  update,
-  remove,
+  updateProduct,
+  removeProduct,
   getProductById,
   getAllProduct,
   search,
   searchproduct,
+  getTopProducts,
 };

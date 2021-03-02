@@ -5,7 +5,7 @@ module.exports = async function (req, res, next) {
     if (!req.file) return next();
     let { secure_url, public_id } = await upload(
       req.file.path,
-      req.image || `estore/${req.file.filename}`
+      req.body.image ? req.body.image.ref : `estore/${req.file.filename}`
     );
     req.body.image = { url: secure_url, ref: public_id };
     next();

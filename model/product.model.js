@@ -31,7 +31,6 @@ const productSchema = mongoose.Schema(
     },
     description: {
       type: String,
-      lowercase: true,
       trim: true,
       required: [true, "product description is required."],
     },
