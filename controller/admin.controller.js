@@ -36,23 +36,18 @@ async function getAllUser(req, res, next) {
   }
 }
 
-function disableUser(req, res, next) {
-  usermodel
-    .findById({ _id: req.params.id })
-    .then(function (user) {
-      if (user) {
-        user.updateOne({ _id: user._id }, { status: 2 }, function (err) {
-          if (err) {
-            return next(err);
-          }
-        });
-      } else {
-        next("user not found");
-      }
-    })
-    .catch(function (err) {
-      next(err);
-    });
+async function disableUser(req, res, next) {
+  try {
+    let user = await usermodel
+      .findById(req.params.id, { username: 1, role: 1, disabled: 1 })
+      .lean();
+    if (!user) throw { message: "user not found", status: 400 };
+    if (user.role === 0) throw { messsage: "access denied", status: 400 };
+    await usermodel.updateOne({ _id: req.params.id }, { disabled: user.disabled ? false : true });
+    res.json({ message: "done" }).status(201);
+  } catch (err) {
+    next({ message: err.message, status: err.status });
+  }
 }
 module.exports = {
   createAdmin,

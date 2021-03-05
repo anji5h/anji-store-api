@@ -1,5 +1,6 @@
 const { mapMongoError } = require("../helper/map.error");
 const { mapProduct } = require("../helper/map.product");
+const cartModel = require("../model/cart.model");
 const productModel = require("../model/product.model");
 
 async function addProduct(req, res, next) {
@@ -81,6 +82,50 @@ async function removeProduct(req, res, next) {
   }
 }
 
+async function addToCart(req, res, next) {
+  try {
+    if (req.user && req.user.role === 0) throw { message: "access denied", status: 400 };
+    const data = {
+      product: req.params.id,
+      user: req.user._id,
+      quantity: req.body.quantity,
+    };
+    let cartItem = await cartModel
+      .findOne({
+        user: data.user,
+        product: { $eq: data.product },
+      })
+      .lean();
+    if (cartItem) throw { message: "product already added to cart", status: 400 };
+    await cartModel.create(data);
+    res.json({ message: "product added to cart" }).status(201);
+  } catch (err) {
+    return next({ message: err.message, status: err.status });
+  }
+}
+
+async function deleteFromCart(req, res, next) {
+  try {
+    let cartItem = await cartModel.findById(req.params.id).lean();
+    if (!cartItem) throw { message: "product not available on cart", status: 400 };
+    await cartModel.deleteOne({ _id: req.params.id });
+    res.json({ message: "product deleted from cart" }).status(201);
+  } catch (err) {
+    return next({ message: err.message, status: err.status });
+  }
+}
+
+async function getFromCart(req, res, next) {
+  try {
+    let cart = await cartModel
+      .find({ user: req.user._id })
+      .populate("product", { name: 1, image: 1, price: 1 })
+      .lean();
+    res.json({ cart }).status(201);
+  } catch (err) {
+    return next({ message: err.message, status: err.status });
+  }
+}
 module.exports = {
   addProduct,
   updateProduct,
@@ -90,4 +135,7 @@ module.exports = {
   search,
   searchproduct,
   getTopProducts,
+  addToCart,
+  deleteFromCart,
+  getFromCart,
 };
