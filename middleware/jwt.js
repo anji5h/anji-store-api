@@ -9,9 +9,7 @@ module.exports = async function (req, res, next) {
   }
   try {
     let decoded = await verifyToken(token);
-    let user = await usermodel
-      .findById(decoded.id, { password: 0, token: 0, tokenExpiry: 0 })
-      .lean();
+    let user = await usermodel.findById(decoded.id, { token: 0, tokenExpiry: 0 }).lean();
     if (!user) {
       return res.clearCookie("auth_token").json({ message: "invalid token" }).status(401);
     }

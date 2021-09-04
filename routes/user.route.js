@@ -1,5 +1,6 @@
-const { getUserDetail} = require("../controller/user.controller");
+const { getUserDetail, updatePassword } = require("../controller/user.controller");
 const router = require("express").Router();
 
-router.get("/getuserdetail", getUserDetail);
+router.get("/detail", getUserDetail);
+router.put("/update/password", updatePassword);
 module.exports = router;

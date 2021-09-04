@@ -9,6 +9,7 @@ const router = require("express").Router();
 
 router.get("/users", getAllUser);
 router.put("/users/:id/disable", disableUser);
+
 router.post("/products", upload.single("image"), uploadImage, productController.addProduct);
 router
   .route("/products/:id")

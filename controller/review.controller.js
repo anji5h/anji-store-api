@@ -1,5 +1,4 @@
-const { mapMongoError } = require("../helper/map.error");
-const { findOne } = require("../model/review.model");
+const productModel = require("../model/product.model");
 const reviewModel = require("../model/review.model");
 
 async function fetchReview(req, res, next) {
@@ -24,12 +23,14 @@ async function createReview(req, res, next) {
       product: req.params.id,
     };
     if (req.user && req.user.role === 0) throw { message: "access denied", status: 400 };
-    let review = await findOne({ user: data.user, product: data.product }).lean();
+    let review = await reviewModel.findOne({ user: data.user, product: data.product }).lean();
     if (review) throw { message: "you have already added the review", status: 400 };
-    await reviewModel.create(data);
+    let query1 = productModel.updateOne({ _id: data.product }, { $inc: { reviews: 1 } });
+    let query2 = reviewModel.create(data);
+    await Promise.all([query1, query2]);
     res.json({ message: "review added." }).status(201);
   } catch (err) {
-    next({ message: mapMongoError(err), status: 400 });
+    next({ message: err.message, status: 400 });
   }
 }
 

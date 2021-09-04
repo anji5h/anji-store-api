@@ -1,63 +1,34 @@
-const { mapUser } = require("../helper/map.user");
 const usermodel = require("../model/user.model");
+const bcrypt = require("bcrypt");
 // routing
 
 function getUserDetail(req, res) {
   res.json({ user: req.user }).status(201);
 }
 
-
-
-function searchUser(req, res, next) {
-  if (req.loggedUser.role === 1) {
-    usermodel
-      .find(
-        { username: new RegExp(`^${req.query.name}`, "i") },
-        { passwordExpirytime: 0, passwordResettoken: 0, password: 0 }
-      )
-      .exec(function (err, done) {
-        if (err) {
-          return next(err);
-        }
-        res.status(200).json(done);
-      });
-  } else {
-    return next("Access denied");
+async function updatePassword(req, res, next) {
+  try {
+    let data = {
+      new_password: req.body.new_password,
+      confrim_password: req.body.confrim_password,
+      old_password: req.body.old_password,
+    };
+    if (data.new_password !== data.confrim_password)
+      throw { message: "password don't match", status: 400 };
+    let isMatch = await bcrypt.compare(data.old_password, req.user.password);
+    if (!isMatch) throw { message: "old password don't match", status: 400 };
+    if (data.old_password === data.new_password)
+      throw { message: "old password match with new password.", status: 400 };
+    let user = await usermodel.findById(req.user._id, { username: 1 });
+    user.password = data.new_password;
+    await user.save();
+    res.json({ message: "password updated" }).status(201);
+  } catch (err) {
+    next({ message: err.message, status: err.status });
   }
-}
-
-function getUser(req, res, next) {
-  usermodel.findById({ _id: req.params.id }).exec(function (err, done) {
-    if (err) {
-      return next(err);
-    }
-    res.json(done).status(200);
-  });
-}
-
-function updateUser(req, res, next) {
-  usermodel
-    .findById({ _id: req.params.id })
-    .then(function (user) {
-      if (user) {
-        mapUser(req.body).save(function (err, done) {
-          if (err) {
-            next(err);
-          } else {
-            res.json(done).status(200);
-          }
-        });
-      } else {
-        next("user not found");
-      }
-    })
-    .catch(function (err) {
-      next(err);
-    });
 }
 
 module.exports = {
   getUserDetail,
-  getUser,
-  updateUser,
+  updatePassword,
 };

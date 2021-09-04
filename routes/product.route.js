@@ -3,9 +3,8 @@ const authentication = require("./../middleware/jwt");
 const productController = require("./../controller/product.controller");
 const reviewController = require("../controller/review.controller");
 
-router.get("/", productController.getAllProduct);
+router.route('/').get(productController.getAllProduct);
 router.get("/top", productController.getTopProducts);
-router.route("/search").get(productController.search).post(productController.searchproduct);
 
 router
   .route("/reviews/:id")

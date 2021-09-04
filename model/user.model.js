@@ -56,17 +56,15 @@ userSchema.pre("save", function (next) {
   if (!this.isModified("password")) {
     return next();
   }
-  if (this.password.length < 8) {
-    return next("password must have 8 characters or more.");
-  }
   bcrypt.hash(this.password, 10, (err, hashed) => {
     if (err) return next(err);
     this.password = hashed;
     next();
   });
 });
+
 userSchema.methods.checkPassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, this.password);
 };
 const usermodel = mongoose.model("user", userSchema);
 module.exports = usermodel;

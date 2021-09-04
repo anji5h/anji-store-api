@@ -26,23 +26,19 @@ async function getAllProduct(req, res, next) {
           },
         }
       : {};
-    let req1 = productModel
+    let query1 = productModel
       .find(keyword)
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .lean();
-    let req2 = productModel.countDocuments(keyword);
-    let [products, count] = await Promise.all([req1, req2]);
+    let query2 = productModel.countDocuments(keyword);
+    let [products, count] = await Promise.all([query1, query2]);
     res.json({ products, page, pages: Math.ceil(count / pageSize) }).status(201);
   } catch (err) {
     console.log(err);
     next({ message: "product fetch failed", status: 400 });
   }
 }
-
-function search(req, res, next) {}
-
-function searchproduct(req, res, next) {}
 
 async function getProductById(req, res, next) {
   try {
@@ -66,7 +62,7 @@ async function updateProduct(req, res, next) {
 
 async function getTopProducts(req, res, next) {
   try {
-    let products = await productModel.find({}).sort({ rating: -1 }).limit(3);
+    let products = await productModel.find({}).sort({ rating: -1 }).limit(3).lean();
     res.json({ products }).status(201);
   } catch (err) {
     next({ message: "product fetch failed", status: 400 });
@@ -92,7 +88,7 @@ async function addToCart(req, res, next) {
     };
     let cartItem = await cartModel
       .findOne({
-        user: data.user,
+        user: { $eq: data.user },
         product: { $eq: data.product },
       })
       .lean();
@@ -119,7 +115,7 @@ async function getFromCart(req, res, next) {
   try {
     let cart = await cartModel
       .find({ user: req.user._id })
-      .populate("product", { name: 1, image: 1, price: 1 })
+      .populate("product", { name: 1, image: 1, price: 1, stock: 1 })
       .lean();
     res.json({ cart }).status(201);
   } catch (err) {
@@ -132,8 +128,6 @@ module.exports = {
   removeProduct,
   getProductById,
   getAllProduct,
-  search,
-  searchproduct,
   getTopProducts,
   addToCart,
   deleteFromCart,
