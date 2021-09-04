@@ -11,7 +11,7 @@ app.use(cookieParser());
 //cors config
 app.use(
   cors({
-    origin: ["http://localhost:4000"],
+    origin: ["https://61337d8d40e8e914c9ed7133--condescending-ptolemy-c765fc.netlify.app"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "PUT"],
@@ -34,4 +34,3 @@ app.listen(port, function (err) {
   }
   console.log(`server listening at port ${port}`);
 });
-
